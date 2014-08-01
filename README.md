@@ -1,3 +1,3 @@
-## EDIT THE GOOGLE DOC FOR NOW
+Obviously the repo name should be 2014, not 2004, but I can't be bothered to change that now
 
-This is just for testing
+THIS IS NOW PRIMARY.
