@@ -80,7 +80,7 @@ The Gene Ontology (GO) is a bioinformatics resource for describing the
 roles genes play in the life of an organism, covering a variety of
 species from humans to bacteria and viruses. The GO is commonly
 presented as a Directed Acyclic Graph (DAG) $G = <V,E>$, where each
-vertex in V is a particular gene descriptor, and E is a set of labeled
+vertex in V is a particular gene descriptor, and E is a set of labeled %Seems to me way too narrow to call GO terms gene descriptors. Or perhaps this is just an old perspective.
 edges connecting two vertices in V. The GO is designed to be used in
 combination with a database $D = <A, M>$ where M is a set of molecular
 entities (e.g. genes or the products of genes) and A is a set of
@@ -101,7 +101,7 @@ diseases\cite{Phevor}. As of today, the GO has been cited NNN times
 (and this is an under-representation of the true use), with XXX tools
 dedicated to using the GO, integrated into MMM databases.
 
-This simple formulation of the GO is popular, but somewhat outdated,
+This simple formulation of the GO is popular, but somewhat outdated,  % delete somewhat?
 as the GO has incorporated an ever increasing number of OWL constructs
 over the years. The core ontology graph G maps to SubClassOf axioms --
 either between two named classes (so called is\_a links) or between a
@@ -125,9 +125,10 @@ The entire ontology reasons in nn s in Elk\cite{Kazakov2014}, and nn minutes in 
 
 The meat and potatoes for reasoning in GO are the equivalence axioms, most typically of a ‘genus-differentia’ form, i.e. X EquivalentTo G and R1 some Y1 and … Rn some Yn. These are known colloquially in GO as ‘cross products’, since the set of such defined classes X can be drawn from the cross-product of the set G and the sets Y1..Yn.
 
-The existence of these axioms allow us to use reasoners to automatically classify the GO, something that is vitally important in an ontology with so many classes. This was previously done entirely by hand, which was time-consuming and error-prone. We aim to follow the Rector Normalization pattern[REF] as closely as possible but in practice this is hard, as we are still in the midst of refactoring a largely hardcoded structure. This is a labor-intensive procedure, we sometimes break this down into chunks depending on the external ontology used for normalization. See for example \cite{Hill2013} which describes refactroing and reasoning using the CHEBI ontology of chemical entities. Ongoing work involves the cell type ontology, Uberon and classifications of proteins.
+The existence of these axioms allow us to use reasoners to automatically classify the GO, something that is vitally important in an ontology with so many classes. This was previously done entirely by hand, which was time-consuming and error-prone. We aim to follow the Rector Normalization pattern[REF] as closely as possible but in practice this is hard, as we are still in the midst of refactoring a largely hardcoded structure. As this is a labor-intensive procedure, we sometimes break this down into chunks depending on the external ontology used for normalization. See for example \cite{Hill2013} which describes refacoring and reasoning using the CHEBI ontology of chemical entities. Ongoing work involves the cell type ontology, Uberon and classifications of proteins.
 
-These axioms can be broken down into intra-ontology and inter-ontology equivalence axioms. The inter-ontology axioms have the added benefit of connecting different ontologies used for classification of different types of data.
+These axioms can be broken down into intra-ontology and inter-ontology equivalence axioms. % Intra-ontology not necessarily equivalence
+The inter-ontology axioms have the added benefit of connecting different ontologies used for classification of different types of data.
 
 We use a number of different Object Properties in these axioms, largely taken from the OBO Relations Ontology [link to RO website].
 
@@ -138,18 +139,18 @@ We use a number of different Object Properties in these axioms, largely taken fr
 
 As well as automatic classification, there is a need for automated quality control processes. The GO has a large QC pipeline, a subset of which is implemented via standard OWL reasoning operating over the axioms in GO.
 
-The majority of constraints in GO are encoded via disjointness axioms; many of the relations used in GO are quite general and thus domain and range constraints are less useful. We achieve a more powerful ‘contextual’ domain-range type assertions using disjointness axioms. For example, the 'part of' relation is flexible regarding whether is it used between processes (for example, a GO biological process such as ‘flower development’) or between ‘static’ material entities (for example, a GO subcellular component, such as ‘synapse’). This generality limits the utility of domain and range. However, the RO includes axioms of the form:
-    'part of' process DisjointWith 'part of' some continuant
-Which prohibits category-crossing uses of 'part of' which would be invalid.
+The majority of constraints in GO are encoded via disjointness axioms; many of the relations used in GO are quite general and thus domain and range constraints are less useful. We achieve more powerful ‘contextual’ domain-range type assertions using disjointness axioms. For example, the `part of' relation is flexible regarding whether is it used between processes (for example, a GO biological process such as ‘flower development’) or between ‘static’ material entities (for example, a GO subcellular component, such as ‘synapse’). This generality limits the utility of domain and range. However, the RO includes axioms of the form:
+    `part of' process DisjointWith `part of' some continuant
+Which prohibits category-crossing uses of `part of' which would be invalid.
 
 Disjointness axioms are also used in the traditional way, between siblings in a taxonomic classification.
 
 We frequently have need to encode spatial and temporospatial constraints. For example, most of the cells in a complex organism such as yourself consist of a number of compartments, including the nucleus (the central HQ, where most of your genes live) and the cytosol (a kind of soup full of molecular machines doing their business). It’s not enough to simply state that the cell and cytosol are disjoint classes. We also want to encode what in RCC8 terms is the disconnected relation, the fact that no parts are shared in common (made impossible by the existence of a membrane barrier between the two). We do this using General Class Inclusion axioms (GCI axioms), e.g.
-     ('part of' cytosol) DisjointWith ('part of' nucleus)
+     (`part of' cytosol) DisjointWith (`part of' nucleus)
 
 Constraints are also used to check the contents of databases. For example…..
 
-Another common type of contsraint in the GO are so-called ‘taxon constraints’ \cite{Deegan2010}. The basic idea here is that the GO covers biology for all domains of life, from single-celled organisms to humans. However, many of the classes are applicable to specific lineages. For example, in describing the function of genes in Dictyostelium discoideum (slime mold), it would be a mistake to use the GO class ‘brain development’, as these ameoboid organisms lack a nervous system of any type. Whilst a human curator would be unlikely to make such a gross error, the same cannot be said for algorithmic prediction methods that make use of the ‘ortholog conjecture’, to infer the function of a gene in one species based on the function of the equivalent gene in another species. Here it is useful to have a knowledge-based approach to validation.
+Another common type of contsraint in the GO are so-called `taxon constraints' \cite{Deegan2010}. The basic idea here is that the GO covers biology for all domains of life, from single-celled organisms to humans. However, many of the classes are applicable to specific lineages. For example, in describing the function of genes in Dictyostelium discoideum (slime mold), it would be a mistake to use the GO class ‘brain development’, as these ameoboid organisms lack a nervous system of any type. Whilst a human curator would be unlikely to make such a gross error, the same cannot be said for algorithmic prediction methods that make use of the `ortholog conjecture' to infer the function of a gene in one species based on the function of the equivalent gene in another species. Here it is useful to have a knowledge-based approach to validation.
 
 
 % ========================================
