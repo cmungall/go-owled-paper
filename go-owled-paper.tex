@@ -86,54 +86,82 @@ roles genes play in the life of an organism, covering a variety of
 species from humans to bacteria and viruses.
 
 The way the GO is most commonly presented in publications elides much
-of the underlying axiomatization. The most common conceptions if a
-Directed Acyclic Graph (DAG) $G = <V,E>$, where each vertex in V is a
-particular gene ``descriptor'', and E is a set of labeled edges connecting
-two vertices in V. The GO is designed to be used in combination with a
-database $D = <A, M>$ where M is a set of molecular entities
-(e.g. genes or the products of genes) and A is a set of associations
-where each association connects an element of V with an element of
-M. Currently GO has some 40k vertices, nnn edges, and the combined set
-of databases using GO have xxx associations covering yyy genes in zzz
-different species\cite{Blake2013}.
+of the underlying axiomatization and formal semantics. The most common
+conception is a Directed Acyclic Graph (DAG) $G = <V,E>$, where each
+vertex in V is a particular gene ``descriptor'', and E is a set of
+labeled edges connecting two vertices in V. The GO is not of much use
+to biologists in itself - the value comes in how databases use the GO
+to ``annotate'' genes and molecular entities.  A database $D$ is a
+pair $<A, M>$ where M is a set of molecular entities (e.g. genes or
+the products of genes) and A is a set of associations where each
+association connects an element of V with an element of M. Currently
+GO has some 40k vertices, nnn edges, and the combined set of databases
+using GO have xxx associations covering yyy genes in zzz different
+species\cite{Blake2013}.
 
-The GO is used in a number of ways. The simplest way is to interrogate
-a database, for example to find the set of descriptors for a gene, or
-to find the set of genes for a descriptor (making use of E). One of
-the most common uses is to find a functional interpretation of a set
-of genes, a so-called enrichment test, for example given a a set of
-genes that are switched on as a result of an organism being exposed to
-an environmental toxin[REF]. Another use is as a component of a
-diagnostic tool for finding causative genes in rare
-diseases\cite{Phevor}. As of today, the GO has been cited NNN times
-(and this is an under-representation of the true use), with XXX tools
-dedicated to using the GO, integrated into MMM databases.
+The users of the GO apply it in a number of ways. The simplest way is
+to interrogate a database, for example to find the set of descriptors
+for a gene, or to find the set of genes for a descriptor (making use
+of the edges in $E$). One of the most common uses is to find a
+functional interpretation of a set of genes, a so-called enrichment
+test. For example, given a set of genes that become active as a result
+of an organism being exposed to an environmental toxin[REF]. Another
+use is as a component of a diagnostic tool for finding causative genes
+in rare diseases\cite{Phevor}. As of today, the GO has been cited NNN
+times (and this is an under-representation of the true use), with XXX
+tools dedicated to using the GO, integrated into MMM databases.
 
-This simple formulation of the GO is popular, but somewhat outdated,  % delete somewhat?
-as the GO has incorporated an ever increasing number of OWL constructs
-over the years. The core ontology graph G maps to SubClassOf axioms --
+This simple formulation of the GO is popular, but outdated, as the GO
+has incorporated an ever increasing number of OWL constructs over the
+years. The core ontology graph $G$ maps to \emph{SubClassOf} axioms --
 either between two named classes (so called is\_a links) or between a
-class an an expression of the form R some Y. Behind the scenes there
-are additional axioms, some of which are described here.
+class an expression of the form \emph{R some Y}. Behind the scenes
+there are additional axioms, some of which we will describe in this
+manuscript.
 
 % ========================================
 \section{The Axiomatic Structure and Logic of the GO}
 % ========================================
 
-The GO consists of 40k classes, but also includes an import chain that brings in an additional nnn classes from 5? additional ontologies. The majority of the axioms in this import chain are within the EL++ profile, allowing for the use of faster reasoners (axioms outset this subset are described later).
+The GO consists of over 40,000 classes, but also includes an import
+chain that brings in an additional nnn classes from 5? additional
+ontologies. The majority of the axioms in this import chain are within
+the EL++ profile, allowing for the use of faster reasoners (we will
+describe the small number of axioms outset this profile further on).
 
-The breakdown of axiom types and expression types is as follows [TABLE]. As can be seen, the most common expression types in GO are existential restrictions and intersections, with the latter used almost entirely within equivalence axioms.
+The breakdown of axiom types and expression types is as follows
+[TABLE]. As can be seen, the most common expression types in GO are
+existential restrictions and intersections, with the latter used
+almost entirely within equivalence axioms.
 
-The entire ontology reasons in nn s in Elk\cite{Kazakov2014}, and nn minutes in Hermit.
+The entire ontology reasons in nn s in Elk\cite{Kazakov2014}, and nn
+minutes in Hermit.
 
 % ========================================
 \section{Equivalence axioms in GO}
 % ========================================
 
+The meat and potatoes for reasoning in GO are the equivalence axioms,
+most typically of a ``genus-differentia'' form, i.e. \emph{X
+  EquivalentTo G and R1 some Y1 and … Rn some Yn}. These were
+historically referred to in GO as ‘cross
+products’\cite{Mungall2010GOXP}, since the set of such defined classes
+$X$ are a subset of the cross-product of the set $G$ and the sets
+$Y1..Yn$.
 
-The meat and potatoes for reasoning in GO are the equivalence axioms, most typically of a ‘genus-differentia’ form, i.e. X EquivalentTo G and R1 some Y1 and … Rn some Yn. These are known colloquially in GO as ‘cross products’, since the set of such defined classes X can be drawn from the cross-product of the set G and the sets Y1..Yn.
-
-The existence of these axioms allow us to use reasoners to automatically classify the GO, something that is vitally important in an ontology with so many classes. This was previously done entirely by hand, which was time-consuming and error-prone. We aim to follow the Rector Normalization pattern[REF] as closely as possible but in practice this is hard, as we are still in the midst of refactoring a largely hardcoded structure. As this is a labor-intensive procedure, we sometimes break this down into chunks depending on the external ontology used for normalization. See for example \cite{Hill2013} which describes refacoring and reasoning using the CHEBI ontology of chemical entities. Ongoing work involves the cell type ontology, Uberon and classifications of proteins.
+The existence of these axioms allow us to use reasoners to
+automatically classify the GO, something that is vitally important in
+an ontology with such a large number of classes. This was previously
+done entirely by hand, which was time-consuming and error-prone. We
+aim to follow the ``Rector Normalization''
+pattern\cite{rector_modularisation_2003} as closely as possible but in
+practice this is hard, as we are still in the midst of refactoring a
+large hand-crafted graph with multiple built-in hidden assumptions. As
+this is a labor-intensive procedure, we sometimes break this down into
+chunks depending on the external ontology used for normalization. See
+for example \cite{Hill2013} which describes refacoring and reasoning
+using the CHEBI ontology of chemical entities. Ongoing work involves
+the cell type ontology, Uberon and classifications of proteins.
 
 These axioms can be broken down into intra-ontology and inter-ontology equivalence axioms. % Intra-ontology not necessarily equivalence
 The inter-ontology axioms have the added benefit of connecting different ontologies used for classification of different types of data.
