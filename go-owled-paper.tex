@@ -63,11 +63,12 @@ David Osumi-Sutherland$^{2}$
 
 The Gene Ontology (GO) is one of the most successful and widely used
 ontologies in the life sciences and indeed in the history of knowledge
-representation. Commonly conceived of as a simple direct acyclic
-graph, the GO is actually well-axiomatized in OWL and makes use of a
-lage stack of OWL tools. Here we outline some of the lesser known
-features of the GO, describe the GO development process, and our
-prognosis for future development in terms of the OWL representation.
+representation. Commonly conceived of as a simple terminology
+structured as a directed acyclic graph, the GO is actually
+well-axiomatized in OWL and makes use of a large stack of OWL
+tools. Here we outline some of the lesser known features of the GO,
+describe the GO development process, and our prognosis for future
+development in terms of the OWL representation.
 
 
 \end{abstract}
@@ -76,18 +77,25 @@ prognosis for future development in terms of the OWL representation.
 \section{Introduction}
 % ========================================
 
+%Seems to me way too narrow to call GO terms gene descriptors. Or perhaps this is just an old perspective.
+% <-- the section starts with ``The GO is commonly presented as'' - I will try and make it clearer that 
+%     I outlining the 'simple' view any people have of the GO
+
 The Gene Ontology (GO) is a bioinformatics resource for describing the
 roles genes play in the life of an organism, covering a variety of
-species from humans to bacteria and viruses. The GO is commonly
-presented as a Directed Acyclic Graph (DAG) $G = <V,E>$, where each
-vertex in V is a particular gene descriptor, and E is a set of labeled %Seems to me way too narrow to call GO terms gene descriptors. Or perhaps this is just an old perspective.
-edges connecting two vertices in V. The GO is designed to be used in
-combination with a database $D = <A, M>$ where M is a set of molecular
-entities (e.g. genes or the products of genes) and A is a set of
-associations where each association connects an element of V with an
-element of M. Currently GO has some 40k vertices, nnn edges, and the
-combined set of databases using GO have xxx associations covering yyy
-genes in zzz different species\cite{Blake2013}.
+species from humans to bacteria and viruses.
+
+The way the GO is most commonly presented in publications elides much
+of the underlying axiomatization. The most common conceptions if a
+Directed Acyclic Graph (DAG) $G = <V,E>$, where each vertex in V is a
+particular gene ``descriptor'', and E is a set of labeled edges connecting
+two vertices in V. The GO is designed to be used in combination with a
+database $D = <A, M>$ where M is a set of molecular entities
+(e.g. genes or the products of genes) and A is a set of associations
+where each association connects an element of V with an element of
+M. Currently GO has some 40k vertices, nnn edges, and the combined set
+of databases using GO have xxx associations covering yyy genes in zzz
+different species\cite{Blake2013}.
 
 The GO is used in a number of ways. The simplest way is to interrogate
 a database, for example to find the set of descriptors for a gene, or
