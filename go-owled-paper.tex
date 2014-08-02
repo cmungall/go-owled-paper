@@ -148,23 +148,23 @@ are additional experimental extensions which are not discussed here
 (but we encourage reasoner developers to contact us for access to
 these for testing purposes).
 
-The breakdown of axiom types and expression types is as follows
-\ref{tab:constructs}. As is evident, existential restrictions and
+Table \ref{tab:constructs} shows the breakdown of axiom types and
+expression types. As is evident, existential restrictions and
 intersections are frequently used, with the latter used entirely
 within equivalence axioms.
 
 \begin{table}
 \begin{tabular}{ | p{4cm} | p{3cm} | p{4cm} }
 \hline
-\textbf{Construct} & \textbf{Usages} & \textbf{Example}  \\
+\textbf{Construct} & \textbf{Usages}  \\
 \hline
-Axiom & 556088 & \\
-EquivalentClasses & 27108 & 'nuclear chromosome' EquivalentTo chromosome and partOf some nucleus \\
-IntersectionOf & 27108 & \\
+Axiom & 556088 \\
+EquivalentClasses & 27108 \\
+IntersectionOf & 27108 \\
 SubClassOf & 106063 &  \\
-AnnotationAssertion & 370394 & \\
-DisjointClasses & 127 & \\
-SomeValuesFrom & 36125 & \\
+AnnotationAssertion & 370394 \\
+DisjointClasses & 127 \\
+SomeValuesFrom & 36125 \\
 \hline
 \end{tabular}
 \caption{Axiom or expression types used in the GO }
@@ -185,11 +185,11 @@ minutes in Hermit (on a standard laptop or workstation).
 
 The meat and potatoes for reasoning in GO are the equivalence axioms,
 most typically of a ``genus-differentia'' form, i.e. \emph{X
-  EquivalentTo G and R1 some Y1 and … Rn some Yn}. These were
+  EquivalentTo G and $R_1$ some $Y_1$ and … $R_n$ some $Y_n$}. These were
 historically referred to in GO as `cross
 products' \cite{Mungall2010GOXP}, since the set of such defined classes
 $X$ are a subset of the cross-product of the set $G$ and the sets
-$Y1..Yn$.
+$Y$.
 
 The existence of these axioms allow us to use reasoners to
 automatically classify the GO, something that is vitally important in
@@ -220,9 +220,6 @@ axioms is to allow for Rector Normalization and creation of the
 inferred hierarchy in GO, but inter-ontology axioms have the added
 benefit of connecting different ontologies used for classification of
 different types of data.
-
-The version of GO that contains the inter-ontology axioms is called
-``go-plus''.
 
 % ----------------------------------------
 \subsection{Relations in the GO}
@@ -308,26 +305,22 @@ this is a case of evolutionary loss or a case of co-option). Here it
 is useful to have a knowledge-based approach to validation of
 computational predictions.
 
-Our taxonomic constraints take two forms, a positive form (for
-example, 'lactation' \emph{only} occurs in mammals) or a negative form
-(for example, 'photosynthesis' \emph{never} in animals). The most
-obvious way to encode these constraints is with universal restrictions
-(OnlyValuesFrom) and negation (ComplementOf). However, this falls
-outside the EL++ profile.
+The most obvious way to encode taxon constraints is using universal
+restrictions and complementation expressions; however, this has the
+disadvantage of being outside EL++. We instead encode taxon
+constraints as disjointness axioms, as described here\cite{taxonOWL}.
 
-We instead use an alternate encoding that is valid, but not
-necessarily complete. We first perform a pre-processing step over the
-organism taxonomy, and for every pair of siblings (for example, ), we
-create an axiom
-
-\begin{verbatim}
-(in-taxon some ) DisjointWith ()
-\end{verbatim}
-
-TODO
-
-Constraints are also used to check the contents of databases. For
-example….. TODO
+One place where we use UnionOf constructs is in the GO-specific
+extensions of the taxonomy ontology where we create grouping
+classes. For example, the grouping ``Prokaryota'' would not be found
+in the taxonomy ontology as it constitutes a paraphyletic group -
+nevertheless it is useful to refer to refer to these groups, so we
+create these as union classes (in this case, equivalent to the union
+of ``Eubacteria'' and ``Archaea''). The increase in expressivity
+beyond EL++ is not a practical issue here as the groupings do not
+change frequently so we pre-reason and assert the direct subclass
+inferences (here between Prokaryotes and the class for cellular
+organisms).
 
 
 % ----------------------------------------
@@ -359,7 +352,7 @@ able to take advantage of automated reasoning, it was necessary to
 OWL axioms to existing classes, some of which have been around in
 manually asserted hierarchies since the inception of the project. This
 is in contrast to ontologies ``born'' as OWL in which classes are
-typically \emph{prospectively} axiomatized.
+\emph{prospectively} axiomatized, at the time of creation.
 
 The process of restrospective axiomatization was assisted in part by
 the detailed design pattern documentation maintained by the GO editors
@@ -489,7 +482,7 @@ ontology is incoherent, generating subsets of ontologies using the OWL
 Syntactic Locality Module Extractor, and so on.
 
 This pipeline is executed within a Continuous Integration
-framework{Mungall2012a}.
+framework\cite{Mungall2012a}.
 
 
 
