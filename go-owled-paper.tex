@@ -79,7 +79,7 @@ development in terms of the OWL representation.
 
 %Seems to me way too narrow to call GO terms gene descriptors. Or perhaps this is just an old perspective.
 % <-- the section starts with ``The GO is commonly presented as'' - I will try and make it clearer that 
-%     I outlining the 'simple' view any people have of the GO
+%     I'm outlining the 'simple' view any people have of the GO
 
 The Gene Ontology (GO) is a bioinformatics resource for describing the
 roles genes play in the life of an organism, covering a variety of
@@ -95,7 +95,7 @@ to ``annotate'' genes and molecular entities.  A database $D$ is a
 pair $<A, M>$ where M is a set of molecular entities (e.g. genes or
 the products of genes) and A is a set of associations where each
 association connects an element of V with an element of M. Currently
-GO has some 40k vertices, nnn edges, and the combined set of databases
+GO has some 40k vertices, 100k edges, and the combined set of databases
 using GO have xxx associations covering yyy genes in zzz different
 species\cite{Blake2013}.
 
@@ -109,7 +109,6 @@ species\cite{Blake2013}.
   ``anaphase'' shown. Adapted from\cite{washington2008ontologies}. }
 \end{figure}
 %----------------------------------------
-
 
 The users of the GO apply it in a number of ways. The simplest way is
 to interrogate a database, for example to find the set of descriptors
@@ -141,18 +140,44 @@ ontologies. The majority of the axioms in this import chain are within
 the EL++ profile, allowing for the use of faster reasoners (we will
 describe the small number of axioms outset this profile further on).
 
+For release purposes, the GO is available as a limited ``standard
+edition'' which exlcudes imports and external ontologies and a
+complete edition called
+``go-plus''\footnote{http://geneontology.org/page/download-ontology}. There
+are additional experimental extensions which are not discussed here
+(but we encourage reasoner developers to contact us for access to
+these for testing purposes).
+
 The breakdown of axiom types and expression types is as follows
-[TABLE]. As can be seen, the most common expression types in GO are
-existential restrictions and intersections, with the latter used
-almost entirely within equivalence axioms.
+\ref{tab:constructs}. As is evident, existential restrictions and
+intersections are frequently used, with the latter used entirely
+within equivalence axioms.
+
+\begin{table}
+\begin{tabular}{ | p{4cm} | p{3cm} | p{4cm} }
+\hline
+\textbf{Construct} & \textbf{Usages} & \textbf{Example}  \\
+\hline
+Axiom & 556088 & \\
+EquivalentClasses & 27108 & 'nuclear chromosome' EquivalentTo chromosome and partOf some nucleus \\
+IntersectionOf & 27108 & \\
+SubClassOf & 106063 &  \\
+AnnotationAssertion & 370394 & \\
+DisjointClasses & 127 & \\
+SomeValuesFrom & 36125 & \\
+\hline
+\end{tabular}
+\caption{Axiom or expression types used in the GO }
+\label{tab:constructs}
+\end{table}
 
 The part of GO that is most typically exposed to users are the
 SubClassOf axioms (together with annotation assertions), which is weak
 in terms of expressivity but delivers the qery abilities required by
 most users.
 
-The entire ontology reasons in nn s in Elk\cite{kazakov2012elk}, and nn
-minutes in Hermit.
+The entire ontology reasons in seconds in Elk\cite{kazakov2012elk}, and 10
+minutes in Hermit (on a standard laptop or workstation).
 
 % ----------------------------------------
 \subsection{Equivalence axioms in GO}
@@ -258,30 +283,48 @@ e.g.
 (`part of' cytosol) DisjointWith (`part of' nucleus)
 \end{verbatim}
 
+In some cases we can structurally simplify the axiom by using named
+classes such as 'cytosolic part' and 'nuclear part'.
 
 Another common type of contsraint in the GO are so-called `taxon
 constraints' \cite{Deegan2010}. The basic idea here is that the GO
 covers biology for all domains of life, from single-celled organisms
 to humans. However, many of the classes are applicable to specific
-lineages. For example, in describing the function of genes in
-Dictyostelium discoideum (slime mold), it would be a mistake to use
-the GO class ‘brain development’, as these ameoboid organisms lack a
-nervous system of any type. Whilst a human curator would be unlikely
-to make such a gross error, the same cannot be said for algorithmic
-prediction methods that make use of the `ortholog conjecture' to infer
-the function of a gene in one species based on the function of the
-equivalent gene in another species. Here it is useful to have a
-knowledge-based approach to validation.
+lineages. For example, in describing the function of genes in a
+poriferan (sponge), it would be a mistake to use the GO class ‘brain
+development’, or any of its descendant classes, as these simple
+organisms lack a nervous system of any type. Whilst we would hope a
+human curator would not make such an error, the same cannot be said
+for algorithmic prediction methods that make use of the `ortholog
+conjecture'\cite{Thomas2012} to infer the function of a gene in one
+species based on the function of the equivalent gene in another
+species. Sponges have many of the same genes found in other animals
+that form synapses in the nervous system (the jury is out on whether
+this is a case of evolutionary loss or a case of co-option). Here it
+is useful to have a knowledge-based approach to validation of
+computational predictions.
+
+Our taxonomic constraints take two forms, a positive form (for
+example, 'lactation' \emph{only} occurs in mammals) or a negative form
+(for example, 'photosynthesis' \emph{never} in animals). The most
+obvious way to encode these constraints is with universal restrictions
+(OnlyValuesFrom) and negation (ComplementOf). However, this falls
+outside the EL++ profile.
+
+We instead use an alternate encoding that is valid, but not
+necessarily complete. We first perform a pre-processing step over the
+organism taxonomy, and for every pair of siblings (for example, ), we
+create an axiom
+
+\begin{verbatim}
+(in-taxon some ) DisjointWith ()
+\end{verbatim}
+
+TODO
 
 Constraints are also used to check the contents of databases. For
 example….. TODO
 
-% ----------------------------------------
-\subsection{Smuggling OWL expressions into Databases}
-% ----------------------------------------
-
-
-\cite{Huntley2014}
 
 % ----------------------------------------
 \subsection{Annotation axioms}
@@ -345,23 +388,86 @@ plugin that manages the obsoletion of classes according to GO
 lifecycle policy\footnote{https://github.com/balhoff/obo-actions/downloads}, and a partial
 port of the OE graph
 viewer\footnote{https://code.google.com/p/obographview/}, shown in figure
-\ref{fig:gv}.
+\ref{gv}.
+
+%----------------------------------------
+\begin{figure}
+\label{gv}
+\center
+\includegraphics[height=4cm]{gv-plugin}
+\caption{GraphView plugin}
+\end{figure}
+%----------------------------------------
 
 % ----------------------------------------
 \subsection{Web based term submission}
 % ----------------------------------------
 
-We have developed a web
+Biological data curators frequently need new classes for describing
+the genes they are annotating. Often these classes fall into
+particular compositional patterns with placement in the subsumption
+hierarchy calculated automatically. In the past the sole method for
+data curators to obtain new classes was through a sourceforge issue
+tracking system, leading to bottlenecks.
 
-TermGenie\cite{Dietze2014}
-OWLTools and Oort
+To address this we created TermGenie\cite{Dietze2014}, a web-based
+class submission system that allows curators to generate new classes
+instantaneously, provided they pass a suite of logical, lexical and
+structural checks.
+
+TermGenie submission can be according to either pre-specified
+templates, or ``free-form'' submissions.
+
+Currently we specify the templates procedurally as javascript code,
+and we are currently exploring the use of Tawny-OWL\cite{Tawny} as the
+templating engine.
+
+% ----------------------------------------
+\subsection{Smuggling OWL expressions into Databases}
+% ----------------------------------------
+
+\cite{Huntley2014}
+
 
 % ----------------------------------------
 \subsection{Ontology build pipeline}
 % ----------------------------------------
 
-Continuous Integration\cite{Mungall2012a}
-VCSs and continued use of OBO
+As the GO evolved from being a single standalone artefact to modular
+entity with a number of derived products we constructed an ontology
+verification and publishing pipeline.
+
+As is common in the bioinformatics world, we specify and execute our
+pipeline using UNIX Makefiles, which allows the chaining together of
+dependent tasks that consume and produce files.
+
+We developed a command line utility that acts as a kind OWL swiss-army
+knife, with the original name of OWLTools\cite{OWLTools}. We developed
+OWLTools according to the unix philosophy, with a view to integration
+with Makefile-type pipelines. It is primarily a simple wrapper onto
+the OWL API, and allows the execution of tasks such as checking if an
+ontology is incoherent, generating subsets of ontologies using the OWL
+Syntactic Locality Module Extractor, and so on.
+
+This pipeline is executed within a Continuous Integration
+framework{Mungall2012a}.
+
+% ========================================
+\section{Challenges and obstacles}
+% ========================================
+
+% ----------------------------------------
+\section{Dependence on multiple ontologies}
+% ----------------------------------------
+
+% ----------------------------------------
+\section{Editing environments}
+% ----------------------------------------
+
+% ----------------------------------------
+\section{Use of OWL downstream of ontology development pipeline}
+% ----------------------------------------
+
 
 TODO: Discussion of obstacles, what we need, when do we want it. Inferring
 subclass of 'part of' some Y. More OE like experience in Protege. More
