@@ -198,12 +198,7 @@ done entirely by hand, which was time-consuming and error-prone. We
 aim to follow the ``Rector Normalization''
 pattern\cite{rector_modularisation_2003} as closely as possible but in
 practice this is hard, as we are still in the midst of refactoring a
-large hand-crafted graph with multiple built-in hidden assumptions. As
-this is a labor-intensive procedure, we sometimes break this down into
-chunks depending on the external ontology used for normalization. See
-for example \cite{Hill2013} which describes refacoring and reasoning
-using the CHEBI ontology of chemical entities. Ongoing work involves
-the cell type ontology, Uberon and classifications of proteins.
+large hand-crafted graph with multiple built-in hidden assumptions. 
 
 % DOS: Add something on design patterns here?  I think this can be put in the
 % context of the long history of using design pattterns to guide manual 
@@ -212,7 +207,7 @@ the cell type ontology, Uberon and classifications of proteins.
 % reasonably high despite manual maintenance.  Refactoring is partly finding ways to 
 % adapt these patterns with ECs for inference. Commonly used patterns requiring 
 % little editor judgment end up as TG templates.
-
+% CJM - we now have a separate section on this below
 
 % ----------------------------------------
 \subsection{Inter-ontology axioms}
@@ -349,9 +344,42 @@ One of main factors that allowed us to move to OWL was the
 introduction of axiom annotations. We attempt to track provenance on a
 per-axiom level, so this feature is vital to us.
 
+
 % ========================================
 \section{The GO Development environment}
 % ========================================
+
+% ----------------------------------------
+\subsection{Transitioning to OWL}
+% ----------------------------------------
+
+The GO was not born as a Description Logic ontology. In order to be
+able to take advantage of automated reasoning, it was necessary to
+\emph{retrospectively} go back and assign equivalence axioms and other
+OWL axioms to existing classes, some of which have been around in
+manually asserted hierarchies since the inception of the project. This
+is in contrast to ontologies ``born'' as OWL in which classes are
+typically \emph{prospectively} axiomatized.
+
+The process of restrospective axiomatization was assisted in part by
+the detailed design pattern documentation maintained by the GO editors
+-- see for example the documentation on developmental
+processes\footnote{http://www.geneontology.org/page/development}. This
+made it possible to use lexical patterns to derive equivalence
+axioms\cite{Mungall2010GOXP}. For example, if a class $C$ has a label
+``X differentiation'' then we derived an axiom \emph{C EquivalentTo
+  'cell differentiation' and
+  results\_in\_acquisition\_of\_features\_of some X}. X is assumed to
+come from the OBO cell type ontology, and if no such X exists then we
+add this.
+
+However, the axiomatization process revealed many cryptic
+inconsistencies and incoherencies, both within the GO, and between the
+GO and other ontologies. Some of these are trivial to resolve, whereas
+others require a massive conceptual alignment of two domains of
+knowledge. One such case was the alignment of a biology-oriented view of
+metabolic processes with a chemisttry-oriented view\cite{Hill2013}.
+
 
 % ----------------------------------------
 \subsection{Editing tools}
@@ -431,6 +459,8 @@ Currently we specify the templates procedurally as javascript code,
 and we are currently exploring the use of Tawny-OWL\cite{Tawny} as the
 templating engine.
 
+
+
 % ----------------------------------------
 \subsection{Smuggling OWL expressions into Databases}
 % ----------------------------------------
@@ -460,6 +490,8 @@ Syntactic Locality Module Extractor, and so on.
 
 This pipeline is executed within a Continuous Integration
 framework{Mungall2012a}.
+
+
 
 % ========================================
 \section{Challenges and obstacles}
