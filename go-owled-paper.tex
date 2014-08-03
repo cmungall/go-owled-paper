@@ -99,16 +99,6 @@ GO has some 40k vertices, 100k edges, and the combined set of databases
 using GO have xxx associations covering yyy genes in zzz different
 species\cite{Blake2013}.
 
-%----------------------------------------
-\begin{figure}
-\center
-\includegraphics[height=4cm]{dag}
-\caption{A view of the Gene Ontology as a Directed Acyclic
-  Graph. \emph{SubClassOf} axioms depicted with [i], \emph{SubClassOf
-    partOf some} axioms with [p]. Genes for the biological process of
-  ``anaphase'' shown. Adapted from\cite{washington2008ontologies}. }
-\end{figure}
-%----------------------------------------
 
 The users of the GO apply it in a number of ways. The simplest way is
 to interrogate a database, for example to find the set of descriptors
@@ -122,7 +112,7 @@ in rare diseases\cite{Phevor}. As of today, the GO has been cited NNN
 times (and this is an under-representation of the true use), with XXX
 tools dedicated to using the GO, integrated into MMM databases.
 
-This simple formulation of the GO is popular, but outdated, as the GO
+This simple view of the GO is popular, but outdated, as the GO
 has incorporated an ever increasing number of OWL constructs over the
 years. The core ontology graph $G$ maps to \emph{SubClassOf} axioms --
 either between two named classes (so called is\_a links) or between a
@@ -131,8 +121,10 @@ there are additional axioms, some of which we will describe in this
 manuscript.
 
 % ========================================
-\section{The Axiomatic Structure and Logic of the GO}
+\section{The Axiomatic Structure of the GO}
 % ========================================
+
+% Take home: most is in EL++
 
 The GO consists of over 40,000 classes, but also includes an import
 chain that brings in an additional nnn classes from 6 additional
@@ -154,14 +146,14 @@ intersections are frequently used, with the latter used entirely
 within equivalence axioms.
 
 \begin{table}
-\begin{tabular}{ | p{4cm} | p{3cm} | p{4cm} }
+\begin{tabular}{ | p{4cm} | p{3cm} |  }
 \hline
-\textbf{Construct} & \textbf{Usages}  \\
+\textbf{Construct} & \textbf{Usage count}  \\
 \hline
 Axiom & 556088 \\
 EquivalentClasses & 27108 \\
 IntersectionOf & 27108 \\
-SubClassOf & 106063 &  \\
+SubClassOf & 106063  \\
 AnnotationAssertion & 370394 \\
 DisjointClasses & 127 \\
 SomeValuesFrom & 36125 \\
@@ -193,12 +185,12 @@ $Y$.
 
 The existence of these axioms allow us to use reasoners to
 automatically classify the GO, something that is vitally important in
-an ontology with such a large number of classes. This was previously
-done entirely by hand, which was time-consuming and error-prone. We
-aim to follow the ``Rector Normalization''
-pattern\cite{rector_modularisation_2003} as closely as possible but in
-practice this is hard, as we are still in the midst of refactoring a
-large hand-crafted graph with multiple built-in hidden assumptions. 
+an ontology with such a large number of classes. In the current
+release version of GO, over 32,000 SubClassOf axioms were inferred by
+reasoning, representing a substantial efficiency gain for ontology
+developers.
+
+
 
 % DOS: Add something on design patterns here?  I think this can be put in the
 % context of the long history of using design pattterns to guide manual 
@@ -215,11 +207,20 @@ large hand-crafted graph with multiple built-in hidden assumptions.
 
 The subset of GO most commonly exposed comprises the so-called
 ``intra-ontology'' axioms, but GO also contains a rich set of
-inter-ontology axioms. The primary use case for the inter-ontology
-axioms is to allow for Rector Normalization and creation of the
-inferred hierarchy in GO, but inter-ontology axioms have the added
-benefit of connecting different ontologies used for classification of
+inter-ontology axioms, leveraging external ontologies (The plant
+ontology, Uberon, the Cell type ontology, and the CHEBI ontology of
+chemical entities).
+
+The primary use case for the inter-ontology axioms is to allow for
+modularized development and to automatically infer the GO
+hierarchy. Additionally, inter-ontology axioms have the added benefit
+of connecting different ontologies used for classification of
 different types of data.
+
+The inter-ontology axioms are present in the go-plus edition of GO,
+but not the core version. To avoid importing large external ontologies
+in their entirety, we build ``import modules'' using the OWL API
+Syntactic Locality Extractor Module.
 
 % ----------------------------------------
 \subsection{Relations in the GO}
@@ -227,9 +228,9 @@ different types of data.
 
 We use a number of different Object Properties in these axioms, taken
 from the OBO Relations
-Ontology\footnote{http://code.google.com/p/obo-relations}. The most
-commonly used characteristic is Transitivity, and \emph{SubPropertyOf}
-and we rely extensively on \emph{SubPropertyChain}.
+Ontology\footnote{http://code.google.com/p/obo-relations}. We rely
+heavily on Transitivity, \emph{SubPropertyOf} and
+\emph{SubPropertyChain} axioms.
 
 The majority of relations in RO have an Inverse declared. Typically
 within the GO we only use one form, and we never use the
@@ -247,26 +248,27 @@ successfully detect unsatisfiable classes.
 \subsection{Constraints in the GO}
 % ----------------------------------------
 
-As well as automatic classification, there is a need for automated
-quality control processes. The GO has a large QC pipeline, a subset of
-which we implemented via standard OWL reasoning operating over the
-axioms in GO.
+As well as automatic classification, we also make extensive use of
+reasoning as part of our quality control pipeline, both for ontology
+validation, and for the validation of data about genes coming from
+external databases.
 
-We encode the majority of constraints in GO as disjointness axioms;
-most of the relations used in GO are general and lack specific domain
-and range constraints. We achieve more powerful ‘contextual’
-domain-range type assertions using disjointness axioms. For example,
-the `part of' relation is flexible regarding whether is it used
-between processes (for example, a GO biological process such as
-‘flower development’) or between ‘static’ material entities (for
-example, a GO subcellular component, such as ‘synapse’). This
-generality limits the utility of domain and range. However, the RO
-includes axioms of the form: `part of' process DisjointWith `part of' % partOf part_of or `part of' ?
-some continuant Which prohibits category-crossing uses of `part of'
-which would be invalid.
+% partOf part_of or `part of' ?  some
+We encode the majority of constraints in GO as disjointness axioms.
+Domain and range constraints on object properties play less of a
+part. We achieve more powerful ‘contextual’ domain-range type
+assertions using disjointness axioms. For example, the `part of'
+relation is flexible regarding whether is it used between two
+processes (such as those found in the GO 'biological process' branch)
+or between material entities (for example, a GO subcellular component,
+such as ‘synapse’). This generality limits the utility of domain and
+range. However, the RO includes axioms of the form: `part of' process
+DisjointWith `part of' continuant Which prohibits category-crossing
+uses of `part of' which would be invalid.
 
 Disjointness axioms are also used in the traditional way, between
-siblings in a taxonomic classification.
+siblings in a taxonomic classification, although these are typically
+underspecified.
 
 We frequently have need to encode spatial and spatiotemporal
 constraints. For example, most of the cells in a complex organism such
@@ -308,7 +310,7 @@ computational predictions.
 The most obvious way to encode taxon constraints is using universal
 restrictions and complementation expressions; however, this has the
 disadvantage of being outside EL++. We instead encode taxon
-constraints as disjointness axioms, as described here\cite{taxonOWL}.
+constraints as disjointness axioms\cite{taxonOWL}.
 
 One place where we use UnionOf constructs is in the GO-specific
 extensions of the taxonomy ontology where we create grouping
@@ -346,12 +348,15 @@ per-axiom level, so this feature is vital to us.
 \subsection{Transitioning to OWL}
 % ----------------------------------------
 
+% Take home: retrospective is hard
+
 The GO was not born as a Description Logic ontology. In order to be
-able to take advantage of automated reasoning, it was necessary to
-\emph{retrospectively} go back and assign equivalence axioms and other
-OWL axioms to existing classes, some of which have been around in
-manually asserted hierarchies since the inception of the project. This
-is in contrast to ontologies ``born'' as OWL in which classes are
+able to take advantage of automated reasoning, it was necessary for us
+to \emph{retrospectively} go back and assign equivalence axioms and
+other OWL axioms to existing classes, some of which date back to the
+inception of the project. This is in contrast to ontologies ``born''
+as OWL following the Rector Normalization
+pattern\cite{rector_modularisation_2003} in which classes are
 \emph{prospectively} axiomatized, at the time of creation.
 
 The process of restrospective axiomatization was assisted in part by
@@ -366,13 +371,12 @@ axioms\cite{Mungall2010GOXP}. For example, if a class $C$ has a label
 come from the OBO cell type ontology, and if no such X exists then we
 add this.
 
-However, the axiomatization process revealed many cryptic
+However, the axiomatization process frequently revealed cryptic
 inconsistencies and incoherencies, both within the GO, and between the
 GO and other ontologies. Some of these are trivial to resolve, whereas
 others require a massive conceptual alignment of two domains of
-knowledge. One such case was the alignment of a biology-oriented view of
-metabolic processes with a chemisttry-oriented view\cite{Hill2013}.
-
+knowledge. One such case was the alignment of a biology-oriented view
+of metabolic processes with a chemisttry-oriented view\cite{Hill2013}.
 
 % ----------------------------------------
 \subsection{Editing tools}
@@ -387,22 +391,22 @@ ontology. OBO-Edit only supports a subset of OBO-Format, which
 corresponds roughly to EL++, with the addition of other restrictions,
 such as limited ability to nest class expressions. However, the main
 limitation of OBO-Edit is the lack of integration with OWL Reasoners
-such as Elk (OBO-Edit has a built in rule based reasoner which is too
-slow for practical work).
+such as Elk.
 
-From a formal ontologist perspective, the natural progression is to
-switch to editing in Protege. However, whereas Protege excels in areas
-such as reasoning and logical axiom editing, it lacks much of the
-functionality that makes OBO-Edit a productive and intuitive tool for
-the GO developers. These features include powerful search and
-rendering, visualization, inclusion of existential restrictions in
-hierarchical browsing, as well as annotation editing. % Perhaps by annotation editing you mean support for specific 
+Protege represents a superior environment for logic-based ontology
+development, but unfortunately lacks much of the functionality that
+makes OBO-Edit a productive and intuitive tool for the GO
+developers. These features include powerful search and rendering,
+visualization, inclusion of existential restrictions in hierarchical
+browsing, and annotation editing customized for our annotation property vocabulary.
+
+% Mention VC diff/merge issues with OWL?
 
 To overcome this we have been moving to a hybrid editing environment,
 whereby developers use a mixture of OBO-Edit and Protege. The source
-ontology remains in OBO-Format, with the developers using % Mention VC diff/merge issues with OWL?
+ontology remains in OBO-Format, with the developers using 
 OWLTools\cite{OWLTools} to perform the conversion to OWL and
-back. Developers are careful to remain within the OBO subset of OWL. % Editors check for non-convertable axioms on OWL-> OBO
+back. Developers are careful to remain within the OBO subset of OWL. 
 
 At first we employed this hybrid strategy tentatively, with the
 developers using Protege primarily as a debugging tool (for example,
@@ -410,27 +414,18 @@ explanation of inferences leading to unsatisfiable classes). However,
 developers are gradually embracing Protege for other parts of the
 ontology development cycle, such as full-blown editing.
 
-To facilitate this transition, we have been collaborating with other
+To facilitate this transition, we have been working with other
 software developers to create plugins that emulate certain aspects of
-the OE experience. These include an oboeditor annotation viewer and
-editor\footnote{https://github.com/hdietze/protege-obo-plugins}, an
+the OE experience. These include an OBO-Edit style annotation viewer and
+editor\footnote{https://github.com/hdietze/protege-obo-plugins}, a
 plugin that manages the obsoletion of classes according to GO
 lifecycle policy\footnote{https://github.com/balhoff/obo-actions/downloads}, and a partial
 port of the OE graph
-viewer\footnote{https://code.google.com/p/obographview/}, shown in figure
+viewer\footnote{https://code.google.com/p/obographview/}.
 \ref{gv}.
 
-%----------------------------------------
-\begin{figure}
-\label{gv}
-\center
-\includegraphics[height=4cm]{gv-plugin}
-\caption{GraphView plugin}
-\end{figure}
-%----------------------------------------
-
 % ----------------------------------------
-\subsection{Web based term submission}
+\subsection{Web based templated term submission}
 % ----------------------------------------
 
 Biological data curators frequently need new classes for describing
@@ -443,22 +438,31 @@ tracking system, leading to bottlenecks.
 To address this we created TermGenie\cite{Dietze2014}, a web-based
 class submission system that allows curators to generate new classes
 instantaneously, provided they pass a suite of logical, lexical and
-structural checks.
-
-TermGenie submission can be according to either pre-specified
-templates, or ``free-form'' submissions.
+structural checks. TermGenie submission can be according to either
+pre-specified templates, or ``free-form'' submissions.
 
 Currently we specify the templates procedurally as javascript code,
 and we are currently exploring the use of Tawny-OWL\cite{Tawny} as the
 templating engine.
 
 
-
 % ----------------------------------------
 \subsection{Smuggling OWL expressions into Databases}
 % ----------------------------------------
 
-\cite{Huntley2014}
+In order to avoid overloading the ontology with two many named
+classes, we have created an ``annotation extension'' system whereby
+data curators can composed their own class expressions for describing
+genes\cite{Huntley2014}. The expressivity of the system is
+deliberately limited to refining a base class using one or more
+existential restrictions.
+
+This system has so far appeared to be a useful balance between
+expressivity and simplicity. One problem is that data curation takes
+place outside an OWL environment, so any logical errors (for example,
+violation of a domain or range constraint) are not caught until the
+curators submit their data to the central GO database, where we
+perform reasoner-based validation.
 
 
 % ----------------------------------------
@@ -484,25 +488,64 @@ Syntactic Locality Module Extractor, and so on.
 This pipeline is executed within a Continuous Integration
 framework\cite{Mungall2012a}.
 
-
-
 % ========================================
 \section{Challenges and obstacles}
 % ========================================
 
 % ----------------------------------------
-\subsection{Dependence on multiple ontologies}
+\subsection{Challenges of working with multiple ontologies}
 % ----------------------------------------
+
+We aim to follow the Rector Normalization patter, avoiding manual
+assertion of polyhierarchies, instead leveraging modular
+hierarchies. Often these hierarchies fall in the domain of an ontology
+external to GO, which presents a number of challenges. This was one of
+the original motivations for the creation of the Open Biological
+Ontologies (OBO) library, to lower the barrier for interoperation, by
+ensuring all federated ontologies were open, orthogonal and responsive
+to any requirements for improvement or change. Even with these
+barriers lowered, challenges remain. Ontologies developed by different
+groups often reflect different perspectives, design patterns and
+hidden assumptions that can be hard to reconcile. The initial
+axiomatization of one ontology using another often reveals multiple
+unsatisfiable classes and invalid inferences. This can be
+time-consuming to repair. The key here is early, prospective
+integration, rather than after-the-fact.
+
+There is also a deficit of tooling to support working in a
+multi-ontology environment. Naive construction of import chains
+results in highly inefficient transfer of large RDF/XML files over the
+web. The resulting infrastructure is fragile, with multiple points of
+failure. Versioning becomes of paramount importance, because simple
+changes in an imported ontology can wreak havoc, causing mass
+unsatisfiability, or loss of crucial inferences. Multiple partial
+solutions exist, but none are perfect. BioPortal provides URLs for
+individual versions of ontologies, but require an API key, which does
+not work well with owl imports.
+
+The parallels with software development are obvious. As ontologies
+such as GO move from being monolithic to modular, we need the
+equivalent of dependency management and build tools such as Maven, and
+we welcome efforts such as the revent OntoMaven
+project\cite{paschke2013ontomaven}.
+
+Biological ontologies do not always modularize as cleanly as software
+libraries. For example, there are multiple mutual dependencies between
+the cell type ontology and GO (the former relies on the latter to
+describe what cells have evolved to do, the latter relies on the
+former to describe the development of these cells). This presents
+additional challenges.
 
 % Danger of circular dependencies.  Need for ontology equivalent of Maven...
 
 % ----------------------------------------
-\subsection{Editing environments}
+%\subsection{Editing environments}
 % ----------------------------------------
 
 % ----------------------------------------
-\subsection{Use of OWL downstream of ontology development pipeline}
+\subsection{Getting OWL into the mainstream}
 % ----------------------------------------
+
 
 
 TODO: Discussion of obstacles, what we need, when do we want it. Inferring
