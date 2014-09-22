@@ -129,7 +129,7 @@ the EL++ profile, allowing for the use of faster reasoners.
 For release purposes, the GO is available as a limited ``standard
 edition'' which excludes imports and external ontologies and a
 complete edition called
-``go-plus''\footnote{http://geneontology.org/page/download-ontology}. There
+\emph{go-plus}\footnote{http://geneontology.org/page/download-ontology}. There
 are additional experimental extensions which are not discussed here
 (but we encourage reasoner developers to contact us for access to
 these for testing purposes).
@@ -264,9 +264,10 @@ as yourself consist of a number of compartments, including the nucleus
 kind of soup full of molecular machines doing their business). It is
 not enough to simply state that the cell and cytosol are disjoint
 classes. We also want to encode \emph{spatial disjointness}, i.e. at
-no time do they share parts (made impossible by the existence of a
-membrane barrier between the two). We do this using General Class
-Inclusion axioms (GCI axioms), e.g.
+no time\footnote{we elisde for now any discussion of encoding of
+  temporal parameters in OWL} do they share parts (made impossible by
+the existence of a membrane barrier between the two). We do this using
+General Class Inclusion axioms (GCI axioms), e.g.
 
 \begin{verbatim}
 (`part of' some cytosol) DisjointWith (`part of' some nucleus)
@@ -281,8 +282,8 @@ constraints' \cite{Deegan2010}. The basic idea here is that the GO
 covers biology for all domains of life, from single-celled organisms
 to humans. However, many of the classes are applicable to specific
 lineages. For example, in describing the function of genes in a
-poriferan (sponge), it would be a mistake to use the GO class ‘brain
-development’, or any of its descendant classes, as these simple
+poriferan (sponge), it would be a mistake to use the GO class \emph{brain
+development}, or any of its descendant classes, as these simple
 organisms lack a nervous system of any type. Whilst we would hope a
 human curator would not make such an error, the same cannot be said
 for algorithmic prediction methods that make use of the `ortholog
@@ -295,10 +296,13 @@ is useful to have a knowledge-based approach to validation of
 computational predictions.
 
 The most obvious way to encode taxon constraints such as ``nucleus
-found ONLY in Eukaryota'' is using universal restrictions and
-complementation expressions; however, this has the disadvantage of
-being outside EL++. We instead encode taxon constraints as
-disjointness axioms\cite{taxonOWL}.
+part of ONLY Eukaryotic organisms'' is using universal restrictions
+and complementation expressions, and for constraints such as
+``photosynthesis occurs in only NON-mammals'' is to use ComplementOf
+expressions; however, this has the disadvantage of being outside
+EL++. We instead encode taxon constraints using shortcut
+relations\cite{mungall2010shortcuts} and disjointness
+axioms\cite{taxonOWL}.
 
 One place where we use UnionOf constructs is in the GO-specific
 extensions of the taxonomy ontology where we create grouping
@@ -308,7 +312,7 @@ nevertheless it is useful to refer to these groups, so we
 create these as union classes (in this case, equivalent to the union
 of ``Eubacteria'' and ``Archaea''). The increase in expressivity
 beyond EL++ is not a practical issue here as the groupings do not
-change frequently so we pre-reason and assert the direct subclass
+change frequently so we pre-reason with HermiT and assert the direct subclass
 inferences (here between Prokaryotes and the class for cellular
 organisms).
 
