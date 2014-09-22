@@ -82,7 +82,7 @@ development in terms of the OWL representation.
 
 The Gene Ontology (GO) is a bioinformatics resource for describing the
 roles genes play in the life of an organism, covering a variety of
-species from humans to bacteria and viruses.
+species from humans to bacteria and viruses\cite{Ashburner2000}.
 
 The way the GO is most commonly presented in publications elides much
 of the underlying axiomatization and formal semantics. The most common
@@ -112,8 +112,8 @@ genes? Another use is as a component of a diagnostic tool for finding
 causative genes in rare diseases\cite{Singleton2014}.
 
 The simple graph-theoretic view of the GO is effective and popular,
-but outdated, as the GO has incorporated an ever increasing number of
-OWL constructs over the years. 
+but does not take into account that GO has been enriched by an ever
+increasing number of OWL constructs over the years.
 
 % ========================================
 \section{The Axiomatic Structure of the GO}
@@ -158,9 +158,9 @@ SomeValuesFrom & 36125 \\
 \end{table}
 
 The part of GO that is most typically exposed to users are the
-SubClassOf axioms (together with annotation assertions), which is weak
-in terms of expressivity but delivers the query abilities required by
-most users.
+SubClassOf axioms\footnote{including existential restrictions, e.g. part\_of},
+together with annotation assertions, which is weak in terms of
+expressivity but delivers the query abilities required by most users.
 
 The entire ontology reasons in seconds in Elk\cite{kazakov2012elk}, and 10
 minutes in Hermit (on a standard laptop or workstation).
@@ -182,7 +182,7 @@ automatically classify the GO, something that is vitally important in
 an ontology with such a large number of classes. In the current
 release version of GO, over 32,000 SubClassOf axioms were inferred by
 reasoning, representing a substantial efficiency gain for ontology
-developers.
+developers. 
 
 
 
@@ -224,7 +224,7 @@ We use a number of different Object Properties in these axioms, taken
 from the OBO Relations
 Ontology\footnote{http://code.google.com/p/obo-relations}. We rely
 heavily on Transitivity, \emph{SubPropertyOf} and
-\emph{SubPropertyChain} axioms. We have recently started using the
+\emph{ObjectPropertyChain} expressions. We have recently started using the
 inverse of the partOf object property in some existential
 restrictions\cite{berardini2010gene}; Elk ignores the
 InverseProperties axiom, which is generally not an issue, but there
@@ -263,17 +263,18 @@ as yourself consist of a number of compartments, including the nucleus
 (the central HQ, where most of your genes live) and the cytosol (a
 kind of soup full of molecular machines doing their business). It is
 not enough to simply state that the cell and cytosol are disjoint
-classes. We also want to encode \emph{spatial disjointness}, i.e. they
-share no parts (made impossible by the existence of a membrane barrier
-between the two). We do this using General Class Inclusion axioms (GCI
-axioms), e.g.
+classes. We also want to encode \emph{spatial disjointness}, i.e. at
+no time do they share parts (made impossible by the existence of a
+membrane barrier between the two). We do this using General Class
+Inclusion axioms (GCI axioms), e.g.
 
 \begin{verbatim}
-(`part of' cytosol) DisjointWith (`part of' nucleus)
+(`part of' some cytosol) DisjointWith (`part of' some nucleus)
 \end{verbatim}
 
 In some cases we can structurally simplify the axiom by using
-equivalent named classes such as 'cytosolic part' and 'nuclear part'.
+equivalent named classes such as 'cytosolic part' and 'nuclear
+part'. 
 
 Another common type of constraint in the GO are so-called `taxon
 constraints' \cite{Deegan2010}. The basic idea here is that the GO
@@ -293,16 +294,17 @@ this is a case of evolutionary loss or a case of co-option). Here it
 is useful to have a knowledge-based approach to validation of
 computational predictions.
 
-The most obvious way to encode taxon constraints is using universal
-restrictions and complementation expressions; however, this has the
-disadvantage of being outside EL++. We instead encode taxon
-constraints as disjointness axioms\cite{taxonOWL}.
+The most obvious way to encode taxon constraints such as ``nucleus
+found ONLY in Eukaryota'' is using universal restrictions and
+complementation expressions; however, this has the disadvantage of
+being outside EL++. We instead encode taxon constraints as
+disjointness axioms\cite{taxonOWL}.
 
 One place where we use UnionOf constructs is in the GO-specific
 extensions of the taxonomy ontology where we create grouping
 classes. For example, the grouping ``Prokaryota'' would not be
 in the taxonomy ontology as it constitutes a paraphyletic group -
-nevertheless it is useful to refer to refer to these groups, so we
+nevertheless it is useful to refer to these groups, so we
 create these as union classes (in this case, equivalent to the union
 of ``Eubacteria'' and ``Archaea''). The increase in expressivity
 beyond EL++ is not a practical issue here as the groupings do not
@@ -320,6 +322,7 @@ important to our users. In particular, textual definitions, comments
 and synonyms (in addition to labels) are the annotation properties we
 use most commonly.
 
+% reviewer 1: What kind of annotations do you add and why is this feature very vital?
 One of main factors that allowed us to move to OWL was the
 introduction of axiom annotations. We attempt to track provenance on a
 per-axiom level, so this feature is vital to us.
@@ -428,7 +431,7 @@ hierarchy calculated automatically. In the past the sole method for
 data curators to obtain new classes was through a sourceforge issue
 tracking system, leading to bottlenecks.
 
-To address this we created TermGenie\cite{Dietze2014}, a web-based
+To address this we created TermGenie\cite{Dietze2014}\footnote{http://termgenie.org}, a web-based
 class submission system that allows curators to generate new classes
 instantaneously, provided they pass a suite of logical, lexical and
 structural checks. TermGenie submission can be according to either
@@ -443,7 +446,7 @@ templating engine.
 \subsection{Smuggling OWL expressions into Databases}
 % ----------------------------------------
 
-In order to avoid overloading the ontology with two many named
+In order to avoid overloading the ontology with too many named
 classes, we have created an ``annotation extension'' system whereby
 data curators can composed their own class expressions for describing
 genes\cite{Huntley2014}. The expressivity of the system is
@@ -536,7 +539,7 @@ additional challenges.
 % ----------------------------------------
 
 We are highly dependent on OWL as part of the ontology development
-cycle in GO. Axiomatization using equivalence and disjointedness
+cycle in GO. Axiomatization using equivalence and disjointness
 axioms are crucial for automating classification and quality
 control. However, OWL axioms currently play less of a role once the ontology
 is deployed and used. There are large numbers of highly sophisticated
